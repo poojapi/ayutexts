@@ -3,8 +3,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from bs4 import BeautifulSoup
 import re
-import pandas as pd
-from tabulate import tabulate
+#import pandas as pd
+#from tabulate import tabulate
 import os
 import time
 
@@ -20,138 +20,113 @@ def getSCFT(book, driver, id):
         option.append(element.get_attribute("text") )
     return option
 
-
-#launch url
-url = "http://ayutexts.dharaonline.org/frmread.aspx"
-
-# create a new Firefox session
-file = open('ayutextsData/aSTAGgaSaMgraha.txt', 'w+')
-driver = webdriver.Chrome()
-driver.implicitly_wait(30)
-driver.get(url)
-
-# caraka samhitA
-#     sUtrasthAnam
-#         "dIrghaJjIvitIyo/dhyAyaH", "apAmArgataNDulIyo/dhyAyaH", "AragvadhIyo/dhyAyaH", "SaDvirecanaCatACritIyo/dhyAyaH", "mAtrACitIyo/dhyAyaH", "tasyACitIyo/dhyAyaH", "navegAndhAraNIyo/dhyAyaH", "indriyopakramaNIyo/dhyAyaH", "khuDDAkacatuSpAdo/dhyAyaH", "mahAcatuSpAdo/dhyAyaH", "tisraiSaNIyo/dhyAyaH", "vAtakalAkalIyo/dhyAyaH", "snehAdhyAyaH", "svedAdhyAyaH", "upakalpanIyo/dhyAyaH", "cikitsAprAbhRutIyo/dhyAyaH", "kiyantaHCirasIyo/dhyAyaH", "triCothIyo/dhyAyaH", "aSTodarIyo/dhyAyaH", "mahArogAdhyAyaH", "aSTauninditIyo/dhyAyaH", "laGghanabRuMhaNIyo/dhyAyaH", "santarpaNIyo/dhyAyaH", "vidhiCoNitIyo/dhyAyaH", "yajjaHpuruSIyo/dhyAyaH", "AtreyabhadrakApyIyo/dhyAyaH", "annapAnavidhyadhyAyaH", "vividhACitapItIyo/dhyAyaH", "daCaprANAyatanIyo/dhyAyaH", "arthedaCamahAmUlIyo/dhyAyaH"
-#     nidAnasthAnam
-#         "jvaranidAnam", "raktapittanidAnam", "gulmanidAnam", "pramehanidAnam", "kuSThanidAnam", "CoSanidAnam", "unmAdanidAnam", "apasmAranidAnam"
-#     vimAnasthAnam
-
-#     CarIrasthAnam
-#     indriyasthAnam
-#     cikitsAsthAnam
-#     kalpasthAnam
-#     siddhisthAnam
-# suCruta samhitA
-#     sUtrasthAnam
-#     nidAnasthAnam
-#     shArIrasthAnam
-#     cikitsAsthAnam
-#     kalpasthAnam
-#     uttaratantram
-# aSTAGga hRdaya
-#     sUtrasthAnam
-#     CArIrasthAnam
-#     nidAnasthAnam
-#     cikitsAsthAnam
-#     kalpasiddhisthAnam
-#     uttarasthAnam
-# aSTAGga saMgraha
-#     sUtrasthAnam
-#     shArIrasthAnam
-#     nidAnasthAnam
-#     cikitsAsthAnam
-#     kalpasthAnam
-#     uttarasthAnam
-# mAdhava nidAna
-#     complete book
-# CArGgadhara saMhitA
-#     prathama khaNDa
-#     madhyama khaNDa
-#     uttara khaNDa
-#     pariCiSTa khaNDa
-#     dvitIyaM pariCiSTam
-
-# object = {
-#     "book": {
-#         "caraka samhitA": {
-#             "section": {
-#                 "chapter": {
-#                     "dIrghaJjIvitIyo/dhyAyaH": (0,140),
-#                     "apAmArgataNDulIyo": (),
-#                     "AragvadhIyo/dhyAyaH": (),
-#                     "SaDvirecanaCatACritIyo/dhyAyaH": (),
-#                     "mAtrACitIyo/dhyAyaH": (),
-#                     "tasyACitIyo/dhyAyaH": (),
-#                     "navegAndhAraNIyo/dhyAyaH": (),
-#                     "indriyopakramaNIyo/dhyAyaH": (),
-#                     "":()
-#                 }
-#             }
-#         }
-#     }
-# }
-
-#After opening the url above, Selenium clicks the specific agency link
-driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddbook']/option[text()='mAdhava nidAna']").click()
-time.sleep(5)
-sections = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddsection');
-
-for section in sections:
-    driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddsection']/option[text()='"+section+"']").click()
-    time.sleep(2)
-    chapters = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddchapter');
-    for chapter in chapters:
-        if chapter == 'annasvarUpavijJAnIyaH adhyAyaH':
-            chapter = 'annasvarUpavijJAnIyaH     adhyAyaH'
-        if chapter == 'mUtrAghAtanidAnam adhyAyaH':
-            chapter = 'mUtrAghAtanidAnam  adhyAyaH'
-        driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddchapter']/option[text()='"+chapter+"']").click()
-        time.sleep(5)
-        fm = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddfrom');
-        if(len(fm)>0):
-            print('from ', fm[0])
-            print('from ', fm[1])
-            driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddfrom']/option[text()='"+fm[1]+"']").click()
-            time.sleep(3)
-            to = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddto');
-            if(len(to)> 0 ):
-                print('to ', to[len(to) - 1])
-                driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddto']/option[text()='"+to[len(to)-1]+"']").click()
+def doLinks(file, driver):
+    links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
+    t = '...'
+    cont = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a[11]')
+    j = len(cont)
+    while(j != 0):
+        links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
+        time.sleep(3)
+        soup = []
+        #print(len(links))
+        if(len(links)!= 0):
+            links = links[1:]
+            for i in range(1, len(links)+1, 1):
+                driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a['+str(i) + ']').click()
+                soup+=BeautifulSoup(driver.page_source, 'lxml')
                 time.sleep(5)
-                python_button = driver.find_element_by_id('ctl00_ContentPlaceHolder1_btnSearch') #FHSU
-                python_button.click() 
-                time.sleep(7)
-                soup_level1=BeautifulSoup(driver.page_source, 'lxml')
-                clist = soup_level1.find_all('span', {'class': 'Title'})
-                for item in clist:
-                    file.write(item.text)
-                    file.write('\n\n')
-                #print(clist)
-                #print('=====================')
+        for x in soup:
+            clist = x.find_all('span', {'class': 'Title'})
+            for item in clist:
+                file.write(item.text)
+                file.write('\n\n')
+        time.sleep(4)
+        links = []
+        cont = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a[11]')
+        if (len(cont)>0):
+            j = 1
+        else:
+            j -=1
 
-                links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
+def getBook(book, driver, file):
+    #After opening the url above, Selenium clicks the specific agency link
+    driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddbook']/option[text()="+'\"aSTAGga saMgraha\"'+"]").click()
+    time.sleep(5)
+    sections = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddsection');
+
+    for section in sections:
+        driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddsection']/option[text()='"+'\"uttarasthAnam\"'+"']").click()
+        time.sleep(2)
+        chapters = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddchapter');
+        for chapter in chapters:
+            if chapter == 'annasvarUpavijJAnIyaH adhyAyaH':
+                chapter = 'annasvarUpavijJAnIyaH     adhyAyaH'
+            if chapter == 'mUtrAghAtanidAnam adhyAyaH':
+                chapter = 'mUtrAghAtanidAnam  adhyAyaH'
+            driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddchapter']/option[text()='"+'\"rasAyanavidhiH\"'+"']").click()
+            time.sleep(5)
+            fm = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddfrom');
+            if(len(fm)>0):
+                print('from ', fm[0])
+                print('from ', fm[1])
+                driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddfrom']/option[text()='"+fm[1]+"']").click()
                 time.sleep(3)
-                soup = []
-               #print(len(links))
-                if(len(links)!= 0):
-                    for i in range(1, len(links)+1, 1):
-                        driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a['+str(i) + ']').click()
-                        soup+=BeautifulSoup(driver.page_source, 'lxml')
-                        time.sleep(5)
-
-                for x in soup:
-                    clist = x.find_all('span', {'class': 'Title'})
+                to = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddto');
+                if(len(to)> 0 ):
+                    print('to ', to[len(to) - 1])
+                    driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddto']/option[text()='"+to[len(to)-1]+"']").click()
+                    time.sleep(5)
+                    python_button = driver.find_element_by_id('ctl00_ContentPlaceHolder1_btnSearch') #FHSU
+                    python_button.click() 
+                    time.sleep(7)
+                    soup_level1=BeautifulSoup(driver.page_source, 'lxml')
+                    clist = soup_level1.find_all('span', {'class': 'Title'})
                     for item in clist:
                         file.write(item.text)
                         file.write('\n\n')
-                time.sleep(4)
+                    #print(clist)
+                    #print('=====================')
+
+                    links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
+                    time.sleep(3)
+                    soup = []
+                #print(len(links))
+                    if(len(links)!= 0):
+                        for i in range(1, len(links)+1, 1):
+                            driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a['+str(i) + ']').click()
+                            soup+=BeautifulSoup(driver.page_source, 'lxml')
+                            time.sleep(5)
+                    for x in soup:
+                        clist = x.find_all('span', {'class': 'Title'})
+                        for item in clist:
+                            file.write(item.text)
+                            file.write('\n\n')
+                    time.sleep(4)
+
+                    doLinks(file, driver)
+
                     #print(clist)
                 #    print('=======================')
                 #print('$$$$$$$$$$$$$$$$$$$$$$$$$')
 
 
         
+
+#launch url
+url = "http://ayutexts.dharaonline.org/frmread.aspx"
+
+# create a new Firefox session
+driver = webdriver.Chrome('/Users/poojaprakash/Downloads/chromedriver')
+driver.implicitly_wait(30)
+driver.get(url)
+
+books = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddbook');
+
+for book in books:
+    file = open('ayutextsData/'+book+'.txt', 'w+')
+    time.sleep(3)
+    getBook(book, driver, file)
         
 # driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddfrom']/option[text()='0']").click()
 # driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddto']/option[text()='140']").click()
