@@ -22,93 +22,153 @@ def getSCFT(book, driver, id):
 
 def doLinks(file, driver):
     links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
-    t = '...'
-    cont = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a[11]')
-    j = len(cont)
-    while(j != 0):
+    time.sleep(3)
+    soup = []
+    print(len(links))
+    if(len(links)!= 0):
+        links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
+        links = links[1:]
+        print('inside links', links)
+        for i in range(2, len(links)+2, 1):
+            driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a['+str(i) + ']').click()
+            soup+=BeautifulSoup(driver.page_source, 'html.parser')
+            time.sleep(5)
+    for x in soup:
+        clist = x.find_all('span', {'class': 'Title'})
+        for item in clist:
+            print(item.text)
+            file.write(item.text)
+            file.write('\n\n')
+    time.sleep(4)
+    links = []
+    cont = driver.find_elements_by_xpath('//a[contains(text(),\'...\')]')
+    print(len(cont))
+    if(len(cont)==1):
         links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
         time.sleep(3)
         soup = []
-        #print(len(links))
+        print(len(links))
         if(len(links)!= 0):
             links = links[1:]
-            for i in range(1, len(links)+1, 1):
+            print('inside links2', links)
+            for i in range(9, len(links)+2, 1):
                 driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a['+str(i) + ']').click()
-                soup+=BeautifulSoup(driver.page_source, 'lxml')
+                soup+=BeautifulSoup(driver.page_source, 'html.parser')
                 time.sleep(5)
         for x in soup:
             clist = x.find_all('span', {'class': 'Title'})
             for item in clist:
+                print(item.text)
                 file.write(item.text)
                 file.write('\n\n')
         time.sleep(4)
-        links = []
-        cont = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a[11]')
-        if (len(cont)>0):
-            j = 1
-        else:
-            j -=1
+        soup_level1=BeautifulSoup(driver.page_source, 'html.parser')
+        clist = soup_level1.find_all('span', {'class': 'Title'})
+        for item in clist:
+            file.write(item.text)
+            file.write('\n\n')
+        print('in do links', clist)
+
+        return
+    
 
 def getBook(book, driver, file):
     #After opening the url above, Selenium clicks the specific agency link
-    driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddbook']/option[text()="+'\"aSTAGga saMgraha\"'+"]").click()
+    driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddbook']/option[text()='"+book+"']").click()
     time.sleep(5)
     sections = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddsection');
 
     for section in sections:
-        driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddsection']/option[text()='"+'\"uttarasthAnam\"'+"']").click()
+        driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddsection']/option[text()='"+section+"']").click()
         time.sleep(2)
-        chapters = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddchapter');
+        chapters = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddchapter')
         for chapter in chapters:
+            print('chapter ', chapter, 'xx')
             if chapter == 'annasvarUpavijJAnIyaH adhyAyaH':
                 chapter = 'annasvarUpavijJAnIyaH     adhyAyaH'
             if chapter == 'mUtrAghAtanidAnam adhyAyaH':
                 chapter = 'mUtrAghAtanidAnam  adhyAyaH'
-            driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddchapter']/option[text()='"+'\"rasAyanavidhiH\"'+"']").click()
-            time.sleep(5)
-            fm = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddfrom');
-            if(len(fm)>0):
-                print('from ', fm[0])
-                print('from ', fm[1])
-                driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddfrom']/option[text()='"+fm[1]+"']").click()
-                time.sleep(3)
-                to = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddto');
-                if(len(to)> 0 ):
-                    print('to ', to[len(to) - 1])
-                    driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddto']/option[text()='"+to[len(to)-1]+"']").click()
-                    time.sleep(5)
-                    python_button = driver.find_element_by_id('ctl00_ContentPlaceHolder1_btnSearch') #FHSU
-                    python_button.click() 
-                    time.sleep(7)
-                    soup_level1=BeautifulSoup(driver.page_source, 'lxml')
-                    clist = soup_level1.find_all('span', {'class': 'Title'})
-                    for item in clist:
-                        file.write(item.text)
-                        file.write('\n\n')
-                    #print(clist)
-                    #print('=====================')
-
-                    links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
+            if chapter == 'atha vAtavyAdhinidAnam':
+                chapter = 'atha vAtavyAdhinidAnam '
+            if chapter == 'atha mUtrakRcchranidAnam':
+                chapter = 'atha mUtrakRcchranidAnam '
+            if chapter == 'atha CArIravraNanidAnam':
+                chapter = 'atha CArIravraNanidAnam '
+            if chapter == 'atha CUkadoSanidAnam':
+                chapter = 'atha CUkadoSanidAnam '
+            if chapter == 'atha nAsAroganidAnam':
+                chapter = 'atha nAsAroganidAnam '
+            if chapter == 'atha yonikandanidAnam':
+                chapter = 'atha yonikandanidAnam '
+            if chapter == 'atha stanyaduSTinidAnam':
+                chapter = 'atha stanyaduSTinidAnam '
+            if chapter == 'atha viSaroganidAnam':
+                chapter = 'atha viSaroganidAnam '
+            if chapter == 'atha viSayAnukramaNikA':
+                chapter = 'atha viSayAnukramaNikA '
+                continue
+            if chapter == 'atha yakRdrogAdhikAraH':
+                chapter = 'atha  yakRdrogAdhikAraH '
+            if chapter == 'grahaNIroge pathyApathyam':
+                chapter = 'grahaNIroge  pathyApathyam'
+            if chapter == 'dantaroge pathyam':
+                chapter = 'dantaroge~pathyam'
+            if chapter == 'viSAroge pathyApathyam':
+                time.sleep(7)
+                driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddchapter']/option[text()='"+chapter+"']").click()
+                time.sleep(5)
+                fm = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddfrom');
+                if(len(fm)>0):
+                    print('from ', fm[1])
+                    countFile.write('\n' + str(fm[1]))
+                    driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddfrom']/option[text()='"+fm[1]+"']").click()
                     time.sleep(3)
-                    soup = []
-                #print(len(links))
-                    if(len(links)!= 0):
-                        for i in range(1, len(links)+1, 1):
-                            driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a['+str(i) + ']').click()
-                            soup+=BeautifulSoup(driver.page_source, 'lxml')
-                            time.sleep(5)
-                    for x in soup:
-                        clist = x.find_all('span', {'class': 'Title'})
+                    to = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddto');
+                    if(len(to)> 0 ):
+                        print('to ', '\n'+ str(to[len(to) - 1]))
+                        countFile.write(to[len(to) - 1])
+                        driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddto']/option[text()='"+to[len(to)-1]+"']").click()
+                        time.sleep(5)
+                        python_button = driver.find_element_by_id('ctl00_ContentPlaceHolder1_btnSearch') #FHSU
+                        python_button.click() 
+                        time.sleep(7)
+                        
+
+                        links = driver.find_elements_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a')
+                        time.sleep(3)
+                        soup = []
+                        print('starting 2nd page', len(links))
+                        if(len(links)!= 0):
+                            for i in range(1, len(links)+1, 1):
+                                print(str(i))
+                                time.sleep(5)
+                                driver.find_element_by_xpath('//*[@id="ctl00_ContentPlaceHolder1_dgFullText"]/tbody/tr[13]/td/a['+str(i) + ']').click()
+                                soup +=BeautifulSoup(driver.page_source, 'lxml')
+                                time.sleep(5)
+                            for x in soup:
+                                clist = x.find_all('span', {'class': 'Title'})
+                                for item in clist:
+                                    print('clist ', item.text)
+                                    file.write(item.text)
+                                    file.write('\n\n')
+                            time.sleep(4)
+
+                        soup_level1=BeautifulSoup(driver.page_source, 'lxml')
+                        clist = soup_level1.find_all('span', {'class':'Title'})
                         for item in clist:
+                            print(item.text)
                             file.write(item.text)
                             file.write('\n\n')
-                    time.sleep(4)
-
-                    doLinks(file, driver)
-
-                    #print(clist)
-                #    print('=======================')
-                #print('$$$$$$$$$$$$$$$$$$$$$$$$$')
+                        print('=====================')
+                        t = '...'
+                        cont = driver.find_elements_by_xpath('//a[contains(text(),\'...\')]')
+                        j = len(cont)
+                        print('number of paginations', j)
+                        if(len(cont) > 0):
+                            print('in do links')
+                            doLinks(file, driver)
+                            print('=======================')
+                        print('$$$$$$$$$$$$$$$$$$$$$$$$$')
 
 
         
@@ -121,12 +181,16 @@ driver = webdriver.Chrome('/Users/poojaprakash/Downloads/chromedriver')
 driver.implicitly_wait(30)
 driver.get(url)
 
-books = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddbook');
+books = getSCFT('caraka saMhita', driver, 'ctl00_ContentPlaceHolder1_ddbook')
 
+books = books[1:]
 for book in books:
-    file = open('ayutextsData/'+book+'.txt', 'w+')
-    time.sleep(3)
-    getBook(book, driver, file)
+    # 
+    if(book != 'caraka samhitA' and book != 'suCruta samhitA' and book != 'aSTAGga hRdaya' and book != 'aSTAGga saMgraha' and book != 'mAdhava nidAna'):
+        file = open('ayutextsData/'+book+'.txt', 'w+')
+        countFile = open('ayutextsData/'+book+'counts.txt', 'w+')
+        time.sleep(3)
+        getBook(book, driver, file)
         
 # driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddfrom']/option[text()='0']").click()
 # driver.find_element_by_xpath("//select[@name='ctl00$ContentPlaceHolder1$ddto']/option[text()='140']").click()
